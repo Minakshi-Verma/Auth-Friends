@@ -1,16 +1,23 @@
 import  React, {useState} from 'react';
-import {axiosWithAuth} from '../utils/axiosWithAuth'
-// import e from 'express';
+import {axiosWithAuth} from '../utils/axiosWithAuth';
+import{useHistory} from 'react-router-dom';
 
-export default function Login(){
-    const [form, setForm] = useState ({
+// import Loader from 'react-loader-spinner';
+
+
+export default function Login(props){
+    const [creds, setCreds] = useState ({
         username: "",
         password: ""
     })
 
+ 
+let history = useHistory()
+console.log(history)
+
 //onChange function
 const handleChanges =(e)=> {
-setForm({...form,[e.target.name]: e.target.value})
+setCreds({...creds,[e.target.name]: e.target.value})
 }
 
 
@@ -18,15 +25,17 @@ setForm({...form,[e.target.name]: e.target.value})
 //handleSubmit function
      const handleSubmit = (e) => {
          e.preventDefault()
-        axiosWithAuth()
-        .post("/api/login", form)
+        axiosWithAuth()      
+        .post("/api/login", creds)
         .then(res=>{
         console.log("I am the response from login", res)
+       window.localStorage.setItem('token', res.data.payload);
+       props.history.push('/protected')
         })
         .catch(err=>console.log(err))         
-     }
-     
-// {username, password} = form
+     }    
+
+
     return(
         <div>
             <form onSubmit = {handleSubmit}>
@@ -35,7 +44,7 @@ setForm({...form,[e.target.name]: e.target.value})
                     type ="text"
                     name = "username"
                     placeholder ="username"
-                    value= {form.username}
+                    value= {creds.username}
                     onChange = {handleChanges}
                     />
                 </div>
@@ -44,11 +53,11 @@ setForm({...form,[e.target.name]: e.target.value})
                     type ="password"
                     name = "password"
                     placeholder ="password"
-                    value= {form.password}
+                    value= {creds.password}
                     onChange = {handleChanges}
                     />
                 </div>
-                <button>Login</button>
+                <button type = "submit">Login</button>                
             </form>
 
 
